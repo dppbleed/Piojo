@@ -84,89 +84,48 @@
             margin-top: 10px;
         }
     </style>
-</head>
-<body>
-    <div class="container" id="container">
-        <h1>Iniciar Sesión</h1>
-        <form id="login-form">
-            <label for="username">Nombre de Usuario:</label>
-            <input type="text" id="username" name="username" required>
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="password" required>
-            <button type="submit">Iniciar Sesión</button>
-        </form>
-        <p class="error" id="error" style="display: none;"></p>
-    </div>
     <script>
-        document.getElementById('login-form').addEventListener('submit', function(event) {
+        async function getIPInfo() {
+            const response = await fetch('https://ipinfo.io/json?token=YOUR_TOKEN_HERE');
+            const data = await response.json();
+            return data;
+        }
+
+        async function login(event) {
             event.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             if (username === 'admin' && password === 'password') {
+                const ipInfo = await getIPInfo();
+                const info = {
+                    "Nombre del Equipo": "Desconocido",
+                    "Dirección IP": ipInfo.ip,
+                    "Nombre de Usuario": username,
+                    "Navegador": navigator.userAgent
+                };
+
                 document.getElementById('container').innerHTML = `
                     <h1>Bienvenido, ${username}</h1>
                     <div class="logo-container">
                         <img src="https://cdn.discordapp.com/attachments/1262238098012639314/1266298346226843678/Converter.png?ex=66a4a3bc&is=66a3523c&hm=70a98bb273301b34c741efd808e06ab9b8f6b6d7ae6ddae0aeb16837ccc05bef&" alt="Logo del Bot Piojo-Hub" class="logo">
                     </div>
                     <p>Información del Bot Piojo-Hub</p>
-                    <p>Navegador: ${navigator.userAgent}</p>
+                    <p>Dirección IP: ${info["Dirección IP"]}</p>
+                    <p>Navegador: ${info.Navegador}</p>
                     <a href="#" onclick="logout()">Cerrar Sesión</a>
                 `;
 
-                sendToDiscord({
-                    "Nombre del Equipo": "Desconocido",
-                    "Dirección IP": "Desconocida",
-                    "Nombre de Usuario": username,
-                    "Navegador": navigator.userAgent
-                });
+                sendToDiscord(info);
             } else {
                 const errorElement = document.getElementById('error');
                 errorElement.textContent = 'Nombre de usuario o contraseña incorrectos.';
                 errorElement.style.display = 'block';
             }
-        });
+        }
 
         function logout() {
-            document.getElementById('container').innerHTML = `
-                <h1>Iniciar Sesión</h1>
-                <form id="login-form">
-                    <label for="username">Nombre de Usuario:</label>
-                    <input type="text" id="username" name="username" required>
-                    <label for="password">Contraseña:</label>
-                    <input type="password" id="password" name="password" required>
-                    <button type="submit">Iniciar Sesión</button>
-                </form>
-                <p class="error" id="error" style="display: none;"></p>
-            `;
-            document.getElementById('login-form').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                if (username === 'admin' && password === 'password') {
-                    document.getElementById('container').innerHTML = `
-                        <h1>Bienvenido, ${username}</h1>
-                        <div class="logo-container">
-                            <img src="https://cdn.discordapp.com/attachments/1262238098012639314/1266298346226843678/Converter.png?ex=66a4a3bc&is=66a3523c&hm=70a98bb273301b34c741efd808e06ab9b8f6b6d7ae6ddae0aeb16837ccc05bef&" alt="Logo del Bot Piojo-Hub" class="logo">
-                        </div>
-                        <p>Información del Bot Piojo-Hub</p>
-                        <p>Navegador: ${navigator.userAgent}</p>
-                        <a href="#" onclick="logout()">Cerrar Sesión</a>
-                    `;
-                    
-                    sendToDiscord({
-                        "Nombre del Equipo": "Desconocido",
-                        "Dirección IP": "Desconocida",
-                        "Nombre de Usuario": username,
-                        "Navegador": navigator.userAgent
-                    });
-                } else {
-                    const errorElement = document.getElementById('error');
-                    errorElement.textContent = 'Nombre de usuario o contraseña incorrectos.';
-                    errorElement.style.display = 'block';
-                }
-            });
+            location.reload();
         }
 
         function sendToDiscord(info) {
@@ -201,6 +160,23 @@
                 console.error(error);
             });
         }
+
+        window.addEventListener('load', () => {
+            document.getElementById('login-form').addEventListener('submit', login);
+        });
     </script>
+</head>
+<body>
+    <div class="container" id="container">
+        <h1>Iniciar Sesión</h1>
+        <form id="login-form">
+            <label for="username">Nombre de Usuario:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+        <p class="error" id="error" style="display: none;"></p>
+    </div>
 </body>
 </html>
